@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ResumeAI — Smart Resume Screening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Toast -->
+  <div id="toast-container"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="nav-logo-text">ResumeAI</span>
+        <span class="nav-badge">v1.0</span>
+      </div>
+      <div class="nav-links">
+        <span class="nav-tagline">AI-Powered Candidate Matching</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-inner">
+      <div class="hero-chip">AI-Powered Screening</div>
+      <h1 class="hero-title">Smart Resume<br/><span class="gradient-text">Screening System</span></h1>
+      <p class="hero-sub">Rank candidates instantly using TF-IDF + Cosine Similarity. Get match scores, skill gaps, and explanations in seconds.</p>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-num">80+</span><span class="hstat-label">Skills Tracked</span></div>
+        <div class="hstat-divider"></div>
+        <div class="hstat"><span class="hstat-num">2x</span><span class="hstat-label">Signals Combined</span></div>
+        <div class="hstat-divider"></div>
+        <div class="hstat"><span class="hstat-num">100</span><span class="hstat-label">Point Scale</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-wrap">
+
+    <!-- Input Section -->
+    <div class="input-section">
+
+      <!-- JD Card -->
+      <div class="input-card" id="jd-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon jd-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">Job Description</h2>
+              <p class="card-subtitle">Paste the full JD — skills, requirements, experience</p>
+            </div>
+          </div>
+          <div class="char-count" id="jd-count">0 chars</div>
+        </div>
+        <textarea
+          id="jd"
+          class="input-textarea"
+          placeholder="e.g. We are looking for a Python developer with 3+ years of experience in Django, PostgreSQL, REST API, Docker, and AWS. The candidate should have strong problem solving skills and experience with agile methodology..."
+          oninput="updateCharCount()"
+        ></textarea>
+        <div class="card-footer">
+          <button class="btn-clear-sm" onclick="clearJD()">Clear</button>
+          <button class="btn-sample" onclick="loadSampleJD()">Load Sample JD</button>
+        </div>
+      </div>
+
+      <!-- Resumes Card -->
+      <div class="input-card" id="resumes-card">
+        <div class="card-header">
+          <div class="card-title-group">
+            <div class="card-icon res-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <h2 class="card-title">Candidates</h2>
+              <p class="card-subtitle">Add resumes as plain text — one per candidate</p>
+            </div>
+          </div>
+          <div class="resume-counter" id="resume-counter">0 added</div>
+        </div>
+        <div id="resume-list"></div>
+        <button class="btn-add-resume" onclick="addResume()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add Candidate
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Screen Button -->
+    <div class="action-center">
+      <button class="btn-screen" id="screen-btn" onclick="screenResumes()">
+        <span id="btn-content">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Screen Resumes
+        </span>
+      </button>
+      <p class="action-hint">Results will be ranked by match score — highest first</p>
+    </div>
+
+    <!-- Results -->
+    <section id="results-section" class="results-section hidden">
+
+      <!-- Summary Bar -->
+      <div class="summary-bar" id="summary-bar"></div>
+
+      <!-- Results Header -->
+      <div class="results-header">
+        <div>
+          <h2 class="results-title">Screening Results</h2>
+          <p class="results-sub" id="results-sub"></p>
+        </div>
+        <button class="btn-rescreen" onclick="scrollToTop()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          New Screen
+        </button>
+      </div>
+
+      <!-- Cards Grid -->
+      <div id="results-grid" class="results-grid"></div>
+
+    </section>
+  </main>
+
+
+  <script src="app.js"></script>
+</body>
+</html>
